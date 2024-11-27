@@ -1,4 +1,11 @@
-import { CalendarIcon, Link } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarIcon,
+  Check,
+  Copy,
+  Link,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import "./App.css";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -30,16 +37,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Calendar } from "./components/ui/calendar";
-
-interface Request {
-  originalUrl: string;
-  expirationDate: number;
-}
+import { createShortUrl } from "./functions/create-short-url";
+import { ShortUrlResponse } from "./model/short-url-response";
+import { Spinner } from "./components/ui/spinner";
+import { Card, CardContent } from "./components/ui/card";
+import { toast } from "sonner";
 
 function App() {
   const [date, setDate] = useState<Date>();
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [requestValues, setRequestValues] = useState<Request>();
+  const [urlCode, setUrlCode] = useState<ShortUrlResponse>();
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     originalUrl: z.string().min(5, {
@@ -58,15 +66,24 @@ function App() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    setRequestValues(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    const response: ShortUrlResponse = await createShortUrl({
+      originalUrl: values.originalUrl,
+      expirationTime: values.expirationDate.toString(),
+    });
+    if (response != null) {
+
+      if(response.message) toast.error(`Erro ao encurtar URL:  ${response.message}`);
+      if(response.code) toast.success(`Sucesso ao encurtar URL!`);
+
+      setUrlCode(response);
+      setLoading(false);
+    }
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-6  w-full items-center">
       <div className="flex flex-col gap-6">
         {/* <div className="grid w-full max-w-sm items-center gap-1.5">
           <Label htmlFor="email">URL original</Label>
@@ -125,7 +142,10 @@ function App() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-2 w-full"
+        >
           <FormField
             control={form.control}
             name="originalUrl"
@@ -232,8 +252,56 @@ function App() {
           </div>
         </form>
       </Form>
-      <div>{requestValues?.expirationDate}</div>
-    </>
+      <div>
+        <Spinner show={loading} />
+        {urlCode?.code ? (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="text-center flex gap-3">
+              <Check className="text-green-700" />
+              <p>Sucesso ao encurtar a URL!</p>
+            </div>
+            <Card className="bg-gray-200 flex items-center">
+              <CardContent className="flex gap-3 items-center justify-center py-2 px-4">
+                <p>
+                  {import.meta.env.VITE_BASE_API_URL}/{urlCode.code}
+                </p>
+                <SquareArrowOutUpRight
+                  className="hover:cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      `${import.meta.env.VITE_BASE_API_URL}/${urlCode.code}`,
+                      "_blank"
+                    )
+                  }
+                />
+              </CardContent>
+            </Card>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${import.meta.env.VITE_BASE_API_URL}/${urlCode.code}`
+                );
+                toast.success("URL copiada para a área de transferência");
+              }}
+            >
+              Copiar
+              <Copy />
+            </Button>
+          </div>
+        ) : (
+          <>
+            {urlCode?.message && (
+              <div className="text-center flex gap-3">
+                <AlertTriangle className="text-red-700" />
+                <p>Erro ao encurtar a URL! ${urlCode.message}</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
