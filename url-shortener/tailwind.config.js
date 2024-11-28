@@ -49,7 +49,11 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+			'bckg-color' : '#191825',
+			'accent-color' : '#865DFF',
+			'secondary-color' : '#9F84D9',
+			'txt-color' : '#FFA3FD',
   		}
   	}
   },

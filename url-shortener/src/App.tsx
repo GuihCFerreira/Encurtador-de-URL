@@ -84,62 +84,7 @@ function App() {
 
   return (
     <div className="flex flex-col gap-6  w-full items-center">
-      <div className="flex flex-col gap-6">
-        {/* <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="email">URL original</Label>
-          <Input type="email" id="email" placeholder="Email" />
-        </div>
-
-        <Label htmlFor="calendar">Data de expiração</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full max-w-sm justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon />
-              {date ? (
-                format(date, "PPP", { locale: ptBR })
-              ) : (
-                <span>Selecione uma data</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-            <Select
-              onValueChange={(value) =>
-                setDate(addDays(new Date(), Number.parseInt(value)))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma data" />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                <SelectItem value="0">Hoje</SelectItem>
-                <SelectItem value="1">Amanhã</SelectItem>
-                <SelectItem value="3">Em 3 dias</SelectItem>
-                <SelectItem value="7">Em 1 semana</SelectItem>
-                <SelectItem value="14">Em 2 semanas</SelectItem>
-                <SelectItem value="30">Em 1 mês</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="rounded-md border">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                locale={ptBR}
-                id="calendar"
-              />
-            </div>
-          </PopoverContent>
-        </Popover> 
-
-        <Button>Encurtar URL</Button>*/}
-      </div>
+      <h1 className="text-3xl font-bold text-[#FFB936] mb-8">Encurtador de URL</h1>
 
       <Form {...form}>
         <form
@@ -151,12 +96,12 @@ function App() {
             name="originalUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>URL original</FormLabel>
+                <FormLabel className="text-txt-color text-base">URL original</FormLabel>
                 <FormControl>
                   <div className="flex flex-col items-center">
                     <Input
                       placeholder="www.google.com"
-                      className="w-full max-w-sm justify-start text-left font-normal"
+                      className="w-full max-w-sm justify-start text-left font-normal bg-popover"
                       {...field}
                     />
                   </div>
@@ -171,7 +116,7 @@ function App() {
             name="expirationDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Data de expiração</FormLabel>
+                <FormLabel className="text-txt-color text-base">Data de expiração</FormLabel>
                 <FormControl>
                   <div>
                     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -245,20 +190,20 @@ function App() {
             )}
           />
           <div className="p-5">
-            <Button type="submit" className="px-5">
+            <Button type="submit" className="px-5 bg-accent-color hover:bg-secondary-color">
               Encurtar URL
               <Link />
             </Button>
           </div>
         </form>
       </Form>
-      <div>
-        <Spinner show={loading} />
+      <div className="m-3">
+        <Spinner show={loading} className="text-[#FFB936]" />
         {urlCode?.code ? (
           <div className="flex flex-col items-center space-y-4">
             <div className="text-center flex gap-3">
               <Check className="text-green-700" />
-              <p>Sucesso ao encurtar a URL!</p>
+              <p className="text-green-500" >Sucesso ao encurtar a URL!</p>
             </div>
             <Card className="bg-gray-200 flex items-center">
               <CardContent className="flex gap-3 items-center justify-center py-2 px-4">
@@ -266,7 +211,7 @@ function App() {
                   {import.meta.env.VITE_BASE_API_URL}/{urlCode.code}
                 </p>
                 <SquareArrowOutUpRight
-                  className="hover:cursor-pointer"
+                  className="hover:cursor-pointer hover:text-accent-color"
                   onClick={() =>
                     window.open(
                       `${import.meta.env.VITE_BASE_API_URL}/${urlCode.code}`,
@@ -278,7 +223,7 @@ function App() {
             </Card>
 
             <Button
-              variant="outline"
+              className="bg-accent-color hover:bg-secondary-color"
               onClick={() => {
                 navigator.clipboard.writeText(
                   `${import.meta.env.VITE_BASE_API_URL}/${urlCode.code}`
@@ -294,8 +239,8 @@ function App() {
           <>
             {urlCode?.message && (
               <div className="text-center flex gap-3">
-                <AlertTriangle className="text-red-700" />
-                <p>Erro ao encurtar a URL! ${urlCode.message}</p>
+                <AlertTriangle className="text-red-700 " />
+                <p className="text-red-500 ">Erro ao encurtar a URL! ${urlCode.message}</p>
               </div>
             )}
           </>
